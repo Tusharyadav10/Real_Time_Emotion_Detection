@@ -14,9 +14,9 @@ def create_connection():
 
     # Creating table
     table = """ CREATE TABLE EMOTIONS ( 
-                Emotion_Type CHAR(25) NOT NULL,
+                Media CHAR(25) NOT NULL,
                 Link VARCHAR(255) NOT NULL,
-                File_Format CHAR(25) NOT NULL
+                Media_Type CHAR(25) NOT NULL
             ); """
     
     cursor.execute(table)
@@ -44,6 +44,11 @@ def insert_data():
     cursor.execute('''INSERT INTO EMOTIONS VALUES ('Happy', 'https://www.youtube.com/embed/6n9ESFJTnHs?si=E6bGd0M_5xBOk-5n', 'Video')''')
     cursor.execute('''INSERT INTO EMOTIONS VALUES ('Happy', 'https://www.youtube.com/embed/JYNyQcblzgI?si=bX9n1F1ilFVwYxqw', 'Video')''')
     cursor.execute('''INSERT INTO EMOTIONS VALUES ('Happy', 'https://www.youtube.com/embed/o9NfXIXzgnA?si=ZOl6pcNJWtDP9cEN', 'Video')''')
+
+    cursor.execute('''INSERT INTO EMOTIONS VALUES ('Motivation', 'https://www.youtube.com/embed/uSCHmIQ9mo0?si=JtNotQTw663m6AE7', 'Video')''')
+    cursor.execute('''INSERT INTO EMOTIONS VALUES ('Motivation', 'https://www.youtube.com/embed/s4FtPEM6w4M?si=eSTzt30_vV_EKk8A', 'Video')''')
+    cursor.execute('''INSERT INTO EMOTIONS VALUES ('Motivation', 'https://www.youtube.com/embed/n7AmJBb1mBI?si=CZb2D56o2hsZ7vaK', 'Video')''')
+    cursor.execute('''INSERT INTO EMOTIONS VALUES ('Motivation', 'https://www.youtube.com/embed/07YFHTeh5es?si=O_o69sj3sDvgYtSr', 'Video')''')
 
     # Display data inserted 
     print("Data Inserted in the table: ") 
@@ -74,7 +79,7 @@ def get_data():
     i = 0
 
     for row in data: 
-        data_dict["img-" + str(i)] = row[1]
+        data_dict["img-" + str(i)] = (row[0], row[1])
         i += 1
     # print(lst_data)
     # Closing the connection 
@@ -83,4 +88,5 @@ def get_data():
     # data_json = json.dumps(data_dict)
     # print(data_json)
     return data_dict
+    
 # get_data()

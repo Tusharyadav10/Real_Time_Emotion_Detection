@@ -44,10 +44,11 @@ def detect_emotion():
                     if start_time is None:
                         start_time = time.time()
                     elif time.time() - start_time >= stability_duration:
-                        cap.release()
-                        cv2.destroyAllWindows()
                         print(f"Stable emotion detected: {label}")
-                        return label
+                        if label == "Angry" or label == "Sad":
+                            cap.release()
+                            cv2.destroyAllWindows()
+                            return label
                 else:
                     previous_label = label
                     start_time = None
