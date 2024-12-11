@@ -6,20 +6,24 @@ import eel
 import time
 
 @eel.expose
-def detect_emotion():
+def detect_emotion(timeSelect):
     # Initialize necessary variables
     cap = cv2.VideoCapture(0)  # or the appropriate source
     face_classifier = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
     classifier = load_model('model.h5')  # Load your trained model
     emotion_labels = ['Angry', 'Disgust', 'Fear', 'Happy', 'Sad', 'Surprise', 'Neutral']
+    emotion_durations = {emotion: 0 for emotion in emotion_labels}
+
+    # Variables to track time
+    start_time = int(time.time())
+    end_time = start_time + int(timeSelect) * 10  # Convert minutes to seconds
 
     # Variables to track emotion stability
     previous_label = None
-    same_label_count = 0
-    start_time = None
-    stability_duration = 2  # seconds
+    stability_start_time = None
+    stability_duration = 1  # seconds
 
-    while True:
+    while int(time.time()) < end_time:
         _, frame = cap.read()
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         faces = face_classifier.detectMultiScale(gray)
@@ -41,17 +45,14 @@ def detect_emotion():
 
                 # Check if the emotion is stable
                 if label == previous_label:
-                    if start_time is None:
-                        start_time = time.time()
-                    elif time.time() - start_time >= stability_duration:
-                        print(f"Stable emotion detected: {label}")
-                        if label == "Angry" or label == "Sad":
-                            cap.release()
-                            cv2.destroyAllWindows()
-                            return label
+                    if stability_start_time is None:
+                        stability_start_time = time.time()
+                    elif time.time() - stability_start_time >= stability_duration:
+                        emotion_durations[label] += stability_duration
+                        stability_start_time = time.time()
                 else:
                     previous_label = label
-                    start_time = None
+                    stability_start_time = time.time()
             else:
                 cv2.putText(frame, 'No Faces', (30, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
@@ -61,6 +62,16 @@ def detect_emotion():
 
     cap.release()
     cv2.destroyAllWindows()
-    return label
+
+    timeInv = sum(emotion_durations.values())
+
+    # Normalize each duration to percentage
+    for key in emotion_durations:
+        emotion_durations[key] = int((emotion_durations[key] / timeInv) * 100)
+
+    print(emotion_durations)
+    return emotion_durations
+
+    
 
 # print(detect_emotion())
